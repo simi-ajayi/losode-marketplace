@@ -1,36 +1,120 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Losode Marketplace (E-commerce App)
 
-## Getting Started
+Losode-inspired E-commerce web app built with:
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Redux Toolkit + redux-persist
+- TanStack Query
+- Ant Design
+- Paystack Inline (test mode)
 
-First, run the development server:
+## Live API
+All product/category data is fetched from the Platzi Fake Store API.
+- Docs: https://fakeapi.platzi.com/en
+- Default base URL in this project: `https://api.escuelajs.co/api/v1`
 
+## Features Implemented
+- Product listing page (grid, image/title/price)
+- Product details page
+- Search by title
+- Category filter + price range filter
+- Proper loading and error states for queries
+- Cart state with Redux Toolkit
+- Derived selectors (item count and total)
+- Persisted cart state using redux-persist
+- Checkout page (name + email)
+- Paystack modal payment trigger (inline-js)
+- Success / failed / cancelled confirmation UI
+- Responsive layout and reusable components
+
+## Design Direction
+- Losode-style clean luxury layout direction
+- Custom typography (Manrope + Cormorant Garamond)
+- Elevated cards, generous spacing, soft editorial background gradients
+- Mobile + desktop responsive layouts
+
+## Tech Stack
+- `next@16` + App Router
+- `react@19`
+- `typescript`
+- `tailwindcss@4`
+- `@reduxjs/toolkit`, `react-redux`, `redux-persist`
+- `@tanstack/react-query`
+- `antd`, `@ant-design/nextjs-registry`
+- `@paystack/inline-js`
+
+## Project Setup
+### 1. Node version (NVM 22)
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+nvm use 22
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. Configure environment variables
+Create `.env.local` from `.env.example`:
+```bash
+cp .env.example .env.local
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Then set your Paystack public key:
+```env
+NEXT_PUBLIC_PLATZI_API_URL=https://api.escuelajs.co/api/v1
+NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY=pk_test_xxxxxxxxxxxxx
+NEXT_PUBLIC_PAYSTACK_CURRENCY=NGN
+```
 
-## Learn More
+### 4. Run development server
+```bash
+npm run dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+### 5. Production checks
+```bash
+npm run lint
+npm run build
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## GitHub Collaboration Workflow
+All work is split into feature branches as requested.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Branches (in merge order)
+1. `feature/product-listing-search-filter`
+2. `feature/cart-management`
+3. `feature/checkout-paystack`
+4. `feature/github-collaboration-docs`
 
-## Deploy on Vercel
+### Commit format used
+```text
+Feat:`description-of-the feat`
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Suggested PR Flow
+1. Open PR: `feature/product-listing-search-filter` -> `main`
+2. Open PR: `feature/cart-management` -> `feature/product-listing-search-filter` (or `main` after merge)
+3. Open PR: `feature/checkout-paystack` -> `feature/cart-management`
+4. Open PR: `feature/github-collaboration-docs` -> `feature/checkout-paystack`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+After each PR merge, rebase next branch on latest target branch.
+
+## Deployment
+### Vercel
+1. Push repository to GitHub
+2. Import project in Vercel
+3. Set env vars from `.env.example`
+4. Deploy
+
+### Netlify
+1. Connect repository
+2. Build command: `npm run build`
+3. Publish directory: `.next`
+4. Add env vars
+
+## Notes
+- Paystack integration uses client-side test public key only.
+- No secret key is stored in this project.
+- Currency can be switched through `NEXT_PUBLIC_PAYSTACK_CURRENCY`.
