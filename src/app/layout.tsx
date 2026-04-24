@@ -20,13 +20,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="h-full antialiased">
-      <body className="min-h-full bg-[#f9f4eb] text-[#1b1b1b]">
+      <body className="min-h-full bg-[#ffffff] text-[#1b1b1b]">
         <AntdRegistry>
           <AppProviders>
-            <div className="relative min-h-screen overflow-x-clip">
-              <div className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top_right,#f4ead9_0%,transparent_35%),radial-gradient(circle_at_20%_30%,#f8efe3_0%,transparent_32%),linear-gradient(180deg,#fcf9f4_0%,#f9f3e9_100%)]" />
+            <div className="relative min-h-screen overflow-x-clip bg-[#ffffff]">
               <SiteHeader />
-              <main className="mx-auto w-full max-w-[1200px] flex-1 px-4 py-8 sm:px-6 sm:py-10 lg:px-8 lg:py-12">
+              <main className="mx-auto w-full max-w-[1880px] flex-1 px-4 py-6 sm:px-7 sm:py-8 lg:px-20 lg:py-9">
                 {children}
               </main>
               <SiteFooter />
