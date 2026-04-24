@@ -1,12 +1,14 @@
+"use client";
+
 import Link from "next/link";
 
 import { Badge, Button } from "antd";
+import { selectCartItemCount } from "@/store/cart-slice";
+import { useAppSelector } from "@/store/hooks";
 
-interface SiteHeaderProps {
-  cartCount?: number;
-}
+export function SiteHeader() {
+  const cartCount = useAppSelector(selectCartItemCount);
 
-export function SiteHeader({ cartCount = 0 }: SiteHeaderProps) {
   return (
     <header className="sticky top-0 z-50 border-b border-[#ece3d7] bg-[rgba(252,248,243,0.96)] backdrop-blur">
       <div className="mx-auto flex h-20 w-full max-w-[1200px] items-center justify-between px-4 sm:px-6 lg:px-8">

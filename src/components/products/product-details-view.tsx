@@ -7,6 +7,8 @@ import { Alert, Button, Skeleton, Tag, Typography, message } from "antd";
 
 import { formatCurrency } from "@/lib/format";
 import { useProduct } from "@/lib/hooks/use-product";
+import { addToCart } from "@/store/cart-slice";
+import { useAppDispatch } from "@/store/hooks";
 
 const { Title, Paragraph } = Typography;
 
@@ -18,6 +20,7 @@ const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80";
 
 export function ProductDetailsView({ productId }: ProductDetailsViewProps) {
+  const dispatch = useAppDispatch();
   const { data: product, isLoading, isError, error } = useProduct(productId);
 
   if (isLoading) {
@@ -38,7 +41,8 @@ export function ProductDetailsView({ productId }: ProductDetailsViewProps) {
   const imageUrl = product.images[0] || FALLBACK_IMAGE;
 
   const handleAddToCart = () => {
-    message.info("Cart actions are enabled in the next feature branch.");
+    dispatch(addToCart(product));
+    message.success("Item added to cart.");
   };
 
   return (

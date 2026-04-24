@@ -1,9 +1,13 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
 
-import { Button, Tag } from "antd";
+import { Button, Tag, message } from "antd";
 
 import { formatCurrency } from "@/lib/format";
+import { addToCart } from "@/store/cart-slice";
+import { useAppDispatch } from "@/store/hooks";
 import type { Product } from "@/types/product";
 
 interface ProductCardProps {
@@ -14,6 +18,7 @@ const FALLBACK_IMAGE =
   "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=900&q=80";
 
 export function ProductCard({ product }: ProductCardProps) {
+  const dispatch = useAppDispatch();
   const imageUrl = product.images[0] || FALLBACK_IMAGE;
 
   return (
@@ -40,11 +45,23 @@ export function ProductCard({ product }: ProductCardProps) {
           <p className="text-lg font-semibold text-[#111111]">{formatCurrency(product.price)}</p>
         </div>
 
-        <Link href={`/products/${product.id}`}>
-          <Button type="default" className="h-11 w-full rounded-full font-medium">
-            View details
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          <Link href={`/products/${product.id}`}>
+            <Button type="default" className="h-11 w-full rounded-full font-medium">
+              View details
+            </Button>
+          </Link>
+          <Button
+            type="primary"
+            className="h-11 w-full rounded-full font-medium"
+            onClick={() => {
+              dispatch(addToCart(product));
+              message.success("Item added to cart.");
+            }}
+          >
+            Add to cart
           </Button>
-        </Link>
+        </div>
       </div>
     </article>
   );
