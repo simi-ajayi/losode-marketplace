@@ -1,52 +1,60 @@
 "use client";
 
-import { Alert, Skeleton, Typography } from "antd";
+import { Alert } from "antd";
 import { useMemo, useState } from "react";
 
 import { EmptyState } from "@/components/ui/empty-state";
 import { ProductFilters } from "@/components/products/product-filters";
 import { ProductGrid } from "@/components/products/product-grid";
+import { ProductListingSkeleton } from "@/components/products/product-loading-state";
 import { useCategories } from "@/lib/hooks/use-categories";
 import { useProducts } from "@/lib/hooks/use-products";
 
-const { Title, Paragraph } = Typography;
+type SortMode = "featured" | "price-low-to-high" | "price-high-to-low";
+const DEFAULT_MAX_PRICE = 600000;
 
 export function ProductListingView() {
-  const [searchTerm, setSearchTerm] = useState("");
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>("featured");
+  const [priceRange, setPriceRange] = useState<[number, number]>([0, DEFAULT_MAX_PRICE]);
 
   const { data: products = [], isLoading, isError, error } = useProducts();
-  const { data: categories = [] } = useCategories();
+  const { data: categories = [], isLoading: isCategoriesLoading } = useCategories();
 
   const maxPrice = useMemo(
     () => products.reduce((acc, product) => Math.max(acc, product.price), 0),
     [products],
   );
 
-  const [priceRange, setPriceRange] = useState<[number, number]>([0, 1200]);
+  const sliderMax = Math.max(maxPrice, DEFAULT_MAX_PRICE);
 
   const filteredProducts = useMemo(() => {
-    const normalizedSearch = searchTerm.trim().toLowerCase();
-
     return products.filter((product) => {
-      const matchesSearch = product.title.toLowerCase().includes(normalizedSearch);
       const matchesCategory = selectedCategoryId
         ? product.category.id === selectedCategoryId
         : true;
       const matchesPrice =
         product.price >= priceRange[0] && product.price <= priceRange[1];
 
-      return matchesSearch && matchesCategory && matchesPrice;
+      return matchesCategory && matchesPrice;
     });
-  }, [priceRange, products, searchTerm, selectedCategoryId]);
+  }, [priceRange, products, selectedCategoryId]);
+
+  const displayedProducts = useMemo(() => {
+    if (sortMode === "featured") {
+      return filteredProducts;
+    }
+
+    return [...filteredProducts].sort((a, b) => {
+      if (sortMode === "price-low-to-high") {
+        return a.price - b.price;
+      }
+      return b.price - a.price;
+    });
+  }, [filteredProducts, sortMode]);
 
   if (isLoading) {
-    return (
-      <div className="space-y-6">
-        <Skeleton active paragraph={{ rows: 1 }} />
-        <Skeleton active paragraph={{ rows: 8 }} />
-      </div>
-    );
+    return <ProductListingSkeleton />;
   }
 
   if (isError) {
@@ -61,36 +69,58 @@ export function ProductListingView() {
   }
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-3xl border border-[#e8decd] bg-[radial-gradient(circle_at_top_right,#f7efe2_0%,#fbf8f3_52%,#ffffff_100%)] p-6 sm:p-10">
-        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-[#786d5f]">
-          Discover style
+    <div className="space-y-10">
+      <section className="mx-auto max-w-7xl space-y-4 text-center">
+        <h1 className="text-4xl font-semibold tracking-[0.01em] text-[#171717] sm:text-5xl">
+          Clothing
+        </h1>
+        <p className="mx-auto max-w-6xl text-base leading-8 text-[#343434] sm:text-lg">
+          From tailored fits to relaxed styles, find pieces that seamlessly blend
+          comfort with class, perfect for any occasion, because you deserve to look your
+          best every day.
         </p>
-        <Title level={1} className="!mb-2 !mt-3 !font-serif !text-[40px] !leading-tight !text-[#181818] sm:!text-[56px]">
-          Shop curated fashion pieces
-        </Title>
-        <Paragraph className="!m-0 max-w-2xl !text-base !text-[#5c544d]">
-          Explore a modern storefront inspired by Losode&apos;s visual rhythm, featuring
-          curated product cards, elevated spacing, and clear hierarchy.
-        </Paragraph>
       </section>
 
-      <ProductFilters
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-        selectedCategoryId={selectedCategoryId}
-        onCategoryChange={setSelectedCategoryId}
-        maxPrice={maxPrice}
-        priceRange={priceRange}
-        onPriceChange={setPriceRange}
-        categories={categories}
-      />
+      <div className="flex gap-10 w-full">
+        <ProductFilters
+          selectedCategoryId={selectedCategoryId}
+          onCategoryChange={setSelectedCategoryId}
+          maxPrice={sliderMax}
+          priceRange={priceRange}
+          onPriceChange={setPriceRange}
+          categories={categories}
+          itemCount={displayedProducts.length}
+          isLoading={isCategoriesLoading}
+          onClearAll={() => {
+            setSelectedCategoryId(null);
+            setPriceRange([0, sliderMax]);
+            setSortMode("featured");
+          }}
+        />
 
-      {filteredProducts.length > 0 ? (
-        <ProductGrid products={filteredProducts} />
-      ) : (
-        <EmptyState description="No products match the current search/filter selection." />
-      )}
+        <section className="space-y-6">
+          <div className="flex justify-end">
+            <label className="inline-flex items-center gap-2 text-[16px] text-[#2a2a2a]">
+              Sort
+              <select
+                className="rounded-md border border-[#c8c8c8] bg-transparent px-2 py-1 text-[15px] outline-none transition focus:border-[#111]"
+                value={sortMode}
+                onChange={(event) => setSortMode(event.target.value as SortMode)}
+              >
+                <option value="featured">Featured</option>
+                <option value="price-low-to-high">Price: Low to High</option>
+                <option value="price-high-to-low">Price: High to Low</option>
+              </select>
+            </label>
+          </div>
+
+          {displayedProducts.length > 0 ? (
+            <ProductGrid products={displayedProducts} />
+          ) : (
+            <EmptyState description="No products match the current filter selection." />
+          )}
+        </section>
+      </div>
     </div>
   );
 }
