@@ -29,11 +29,57 @@ body {
   font-family: var(--font-manrope), sans-serif;
 }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: var(--font-cormorant), serif;
+.checkout-indicator-radio.ant-radio-wrapper {
+  margin-inline-end: 0;
+}
+
+.checkout-indicator-radio .ant-radio-inner {
+  height: 16px;
+  width: 16px;
+  border-color: #111111 !important;
+  background-color: #ffffff !important;
+}
+
+.checkout-indicator-radio .ant-radio-checked .ant-radio-inner {
+  border-color: #111111 !important;
+  background-color: #ffffff !important;
+}
+
+.checkout-indicator-radio .ant-radio-checked .ant-radio-inner::after {
+  background-color: #111111 !important;
+  transform: translate(-50%, -50%) scale(0.7) !important;
+}
+
+.losode-cart-badge-wrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.losode-cart-badge-value {
+  position: absolute;
+  right: -4px;
+  bottom: 1px;
+  height: 17px;
+  min-width: 17px;
+  border: 1px solid #ffffff;
+  border-radius: 9999px;
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 15px;
+  text-align: center;
+  background: #111111;
+  padding-inline: 3px;
+}
+
+.losode-footer-email .ant-input::placeholder {
+  color: #9d9d9d !important;
+  font-size: 16px;
+  letter-spacing: 0.01em;
+}
+
+@media (max-width: 1023px) {
+  .losode-footer-email .ant-input::placeholder {
+    font-size: 16px;
+  }
 }

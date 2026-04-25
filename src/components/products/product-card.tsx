@@ -4,8 +4,10 @@ import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { HeartFilled, HeartOutlined } from "@ant-design/icons";
 import { message } from "antd";
 
+import { AppButton } from "@/components/ui/app-button";
 import { formatCurrency } from "@/lib/format";
 import type { Product } from "@/types/product";
 
@@ -34,22 +36,24 @@ export function ProductCard({ product }: ProductCardProps) {
 
   return (
     <article className="group space-y-4">
-      <div className="relative overflow-hidden w-[18vw] bg-[#d6d6d6]">
+      <div className="relative overflow-hidden 2xl:w-[18vw] xl:w-[16vw] bg-[#d6d6d6]">
         <Link href={`/products/${product.id}`} className="block">
           <Image
             src={imageUrl}
             alt={product.title}
             width={900}
             height={1100}
-            className="aspect-[4/5] min-h-[480px]  h-full w-full object-cover transition duration-500 group-hover:scale-[1.025]"
+            className="aspect-[4/5] h-full min-h-[480px] w-full object-cover transition duration-500 group-hover:scale-[1.025]"
             unoptimized
           />
         </Link>
 
-        <button
-          type="button"
+        <AppButton
+          htmlType="button"
           aria-label={isSaved ? "Remove from saved items" : "Save item"}
-          className="absolute right-3 top-3 inline-flex h-11 w-11 items-center justify-center rounded-full border border-black/10 bg-white text-[#7f1616] shadow-[0_4px_10px_rgba(0,0,0,0.14)] transition hover:scale-105"
+          variant="ghost"
+          uiSize="icon"
+          className="!absolute !right-3 !top-3 !rounded-full !border !border-black/10 !bg-white !text-[#7f1616] !shadow-[0_4px_10px_rgba(0,0,0,0.14)] hover:!scale-105"
           onClick={() => {
             setIsSaved((previous) => {
               const next = !previous;
@@ -58,8 +62,12 @@ export function ProductCard({ product }: ProductCardProps) {
             });
           }}
         >
-          <HeartIcon filled={isSaved} />
-        </button>
+          {isSaved ? (
+            <HeartFilled className="text-[21px] transition" />
+          ) : (
+            <HeartOutlined className="text-[21px] transition" />
+          )}
+        </AppButton>
       </div>
 
       <div className="">
@@ -68,41 +76,15 @@ export function ProductCard({ product }: ProductCardProps) {
         </p>
 
         <Link href={`/products/${product.id}`} className="block">
-          <h3 className="line-clamp-2 min-h-[58px] text-[15px] text-[2d2d2d]">
+          <h3 className="line-clamp-2 text-[15px] text-[#2d2d2d]">
             {product.title}
           </h3>
         </Link>
 
-        <p className="text-[13px] -mt-7 font-semibold text-[#0f0f0f]">
+        <p className="text-[13px] mt-2 font-semibold text-[#0f0f0f]">
           {formatCurrency(product.price, "NGN")}
         </p>
       </div>
     </article>
-  );
-}
-
-interface HeartIconProps {
-  filled: boolean;
-}
-
-function HeartIcon({ filled }: HeartIconProps) {
-  return (
-    <svg
-      width="21"
-      height="21"
-      viewBox="0 0 24 24"
-      fill={filled ? "currentColor" : "none"}
-      xmlns="http://www.w3.org/2000/svg"
-      stroke="currentColor"
-      strokeWidth="1.7"
-      className="transition"
-      aria-hidden
-    >
-      <path
-        d="M19.08 4.65A5.5 5.5 0 0 0 12 5.95a5.5 5.5 0 0 0-7.08-1.3A5.43 5.43 0 0 0 3.7 12.5L12 20.3l8.3-7.8a5.43 5.43 0 0 0-1.22-7.85Z"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

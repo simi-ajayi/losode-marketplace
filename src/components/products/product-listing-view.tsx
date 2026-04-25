@@ -4,18 +4,19 @@ import { Alert } from "antd";
 import { useMemo, useState } from "react";
 
 import { EmptyState } from "@/components/ui/empty-state";
+import { AppSelect } from "@/components/ui/app-select";
 import { ProductFilters } from "@/components/products/product-filters";
 import { ProductGrid } from "@/components/products/product-grid";
 import { ProductListingSkeleton } from "@/components/products/product-loading-state";
 import { useCategories } from "@/lib/hooks/use-categories";
 import { useProducts } from "@/lib/hooks/use-products";
 
-type SortMode = "featured" | "price-low-to-high" | "price-high-to-low";
+type SortMode = "sort" | "price-low-to-high" | "price-high-to-low";
 const DEFAULT_MAX_PRICE = 600000;
 
 export function ProductListingView() {
   const [selectedCategoryId, setSelectedCategoryId] = useState<number | null>(null);
-  const [sortMode, setSortMode] = useState<SortMode>("featured");
+  const [sortMode, setSortMode] = useState<SortMode>("sort");
   const [priceRange, setPriceRange] = useState<[number, number]>([0, DEFAULT_MAX_PRICE]);
 
   const { data: products = [], isLoading, isError, error } = useProducts();
@@ -41,7 +42,7 @@ export function ProductListingView() {
   }, [priceRange, products, selectedCategoryId]);
 
   const displayedProducts = useMemo(() => {
-    if (sortMode === "featured") {
+    if (sortMode === "sort") {
       return filteredProducts;
     }
 
@@ -69,19 +70,19 @@ export function ProductListingView() {
   }
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
       <section className="mx-auto max-w-7xl space-y-4 text-center">
         <h1 className="text-4xl font-semibold tracking-[0.01em] text-[#171717] sm:text-5xl">
           Clothing
         </h1>
         <p className="mx-auto max-w-6xl text-base leading-8 text-[#343434] sm:text-lg">
-          From tailored fits to relaxed styles, find pieces that seamlessly blend
-          comfort with class, perfect for any occasion, because you deserve to look your
-          best every day.
+          From tailored fits to relaxed styles, find pieces that seamlessly
+          blend comfort with class, perfect for any occasion, because you
+          deserve to look your best every day.
         </p>
       </section>
 
-      <div className="flex gap-10 w-full">
+      <div className="flex w-full gap-10">
         <ProductFilters
           selectedCategoryId={selectedCategoryId}
           onCategoryChange={setSelectedCategoryId}
@@ -94,23 +95,23 @@ export function ProductListingView() {
           onClearAll={() => {
             setSelectedCategoryId(null);
             setPriceRange([0, sliderMax]);
-            setSortMode("featured");
+            setSortMode("sort");
           }}
         />
 
         <section className="space-y-6">
           <div className="flex justify-end">
             <label className="inline-flex items-center gap-2 text-[16px] text-[#2a2a2a]">
-              Sort
-              <select
-                className="rounded-md border border-[#c8c8c8] bg-transparent px-2 py-1 text-[15px] outline-none transition focus:border-[#111]"
+              <AppSelect
+                className="!w-[220px]"
                 value={sortMode}
-                onChange={(event) => setSortMode(event.target.value as SortMode)}
-              >
-                <option value="featured">Featured</option>
-                <option value="price-low-to-high">Price: Low to High</option>
-                <option value="price-high-to-low">Price: High to Low</option>
-              </select>
+                onChange={(value) => setSortMode(value as SortMode)}
+                options={[
+                  // { label: "Featured", value: "featured" },
+                  { label: "Price: Low to High", value: "price-low-to-high" },
+                  { label: "Price: High to Low", value: "price-high-to-low" },
+                ]}
+              />
             </label>
           </div>
 

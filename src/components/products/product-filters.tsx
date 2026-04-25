@@ -4,8 +4,12 @@ import { useMemo, useState } from "react";
 
 import { Slider } from "antd";
 
-import type { Category } from "@/types/product";
 import { ProductFiltersSkeleton } from "@/components/products/product-loading-state";
+import { AppButton } from "@/components/ui/app-button";
+import { AppCheckbox } from "@/components/ui/app-checkbox";
+import { AppInputNumber } from "@/components/ui/app-input";
+import { SectionToggleButton } from "@/components/ui/section-toggle-button";
+import type { Category } from "@/types/product";
 
 type FilterSection =
   | "category"
@@ -65,18 +69,16 @@ export function ProductFilters({
     }));
   };
 
-  const updateMinPrice = (value: string) => {
-    const numericValue = Number(value);
-    const safeValue = Number.isFinite(numericValue)
-      ? Math.max(0, Math.min(numericValue, priceRange[1]))
+  const updateMinPrice = (value: number | null) => {
+    const safeValue = Number.isFinite(value)
+      ? Math.max(0, Math.min(value as number, priceRange[1]))
       : 0;
     onPriceChange([safeValue, priceRange[1]]);
   };
 
-  const updateMaxPrice = (value: string) => {
-    const numericValue = Number(value);
-    const safeValue = Number.isFinite(numericValue)
-      ? Math.max(priceRange[0], Math.min(numericValue, sliderMax))
+  const updateMaxPrice = (value: number | null) => {
+    const safeValue = Number.isFinite(value)
+      ? Math.max(priceRange[0], Math.min(value as number, sliderMax))
       : sliderMax;
     onPriceChange([priceRange[0], safeValue]);
   };
@@ -86,15 +88,15 @@ export function ProductFilters({
   }
 
   return (
-    <aside className="h-fit w-[18vw]">
+    <aside className="h-fit xl:w-[25vw] 2xl:w-[18vw]">
       <div className="flex items-center justify-between border-b border-[#d4d4d4] pb-3 text-[14px] text-[#2f2f2f]">
-        <button
-          type="button"
-          className="transition hover:text-black"
+        <AppButton
+          variant="text"
           onClick={onClearAll}
+          className="!h-auto !px-0 !text-[14px]"
         >
           Clear All
-        </button>
+        </AppButton>
         <p>{itemCount} Items</p>
       </div>
 
@@ -104,31 +106,33 @@ export function ProductFilters({
         expanded={expandedSections.category}
         onToggle={() => toggleSection("category")}
       >
-        <div className="mt-3 flex flex-wrap gap-2">
-          <button
-            type="button"
+        <div className="mt-3 flex">
+          <AppButton
+            variant="chip"
+            uiSize="sm"
             onClick={() => onCategoryChange(null)}
-            className={`rounded-full border px-3 py-1 text-sm transition ${
+            className={
               selectedCategoryId === null
-                ? "border-black bg-black text-white"
-                : "border-[#bcbcbc] text-[#444]"
-            }`}
+                ? "!border-black !bg-black !text-[#444]"
+                : "!border-[#bcbcbc] !text-[#444]"
+            }
           >
             All
-          </button>
+          </AppButton>
           {categories.map((category) => (
-            <button
+            <AppButton
               key={category.id}
-              type="button"
+              variant="chip"
+              uiSize="sm"
               onClick={() => onCategoryChange(category.id)}
-              className={`rounded-full border px-3 py-1 text-[12px] transition ${
+              className={
                 selectedCategoryId === category.id
-                  ? "border-black bg-black text-white"
-                  : "border-[#bcbcbc] text-[#444]"
-              }`}
+                  ? "!border-black !bg-black !text-[#444]"
+                  : "!border-[#bcbcbc] !text-[#444]"
+              }
             >
               {category.name}
-            </button>
+            </AppButton>
           ))}
         </div>
       </FilterSectionBlock>
@@ -169,13 +173,7 @@ export function ProductFilters({
       >
         <div className="mt-3 space-y-2 text-[12px] text-[#2c2c2c]">
           {["Amendments", "Exchanges", "Returns"].map((option) => (
-            <label key={option} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                className="h-5 w-5 rounded border-[#8f8f8f] accent-black"
-              />
-              <span>{option}</span>
-            </label>
+            <AppCheckbox key={option}>{option}</AppCheckbox>
           ))}
         </div>
       </FilterSectionBlock>
@@ -210,25 +208,21 @@ export function ProductFilters({
           <div className="grid grid-cols-2 gap-3 text-[13px] text-[#242424]">
             <label className="space-y-1">
               <span className="block text-[12px] text-[#5a5a5a]">min</span>
-              <input
-                type="number"
+              <AppInputNumber
                 min={0}
                 max={priceRange[1]}
-                className="w-full rounded-[10px] border border-[#8f8f8f] bg-transparent px-3 py-2 text-[12px]"
                 value={priceRange[0]}
-                onChange={(event) => updateMinPrice(event.target.value)}
+                onChange={updateMinPrice}
               />
             </label>
 
             <label className="space-y-1">
               <span className="block text-[12px] text-[#5a5a5a]">max</span>
-              <input
-                type="number"
+              <AppInputNumber
                 min={priceRange[0]}
                 max={sliderMax}
-                className="w-full rounded-[10px] border border-[#8f8f8f] bg-transparent px-3 py-2 text-[12px]"
                 value={priceRange[1]}
-                onChange={(event) => updateMaxPrice(event.target.value)}
+                onChange={updateMaxPrice}
               />
             </label>
           </div>
@@ -255,16 +249,15 @@ function FilterSectionBlock({
 }: FilterSectionBlockProps) {
   return (
     <section className="border-b border-[#d4d4d4] py-3">
-      <button
-        type="button"
-        className="flex w-full items-center justify-between text-left text-[13px] font-semibold text-[#222]"
+      <SectionToggleButton
+        expanded={expanded}
         onClick={onToggle}
-      >
-        <span>{title}</span>
-        <span className="text-[20px] leading-none">{expanded ? "−" : "+"}</span>
-      </button>
+        label={title}
+        className="!text-[13px] !tracking-wider"
+        labelClassName="text-[#222222]"
+      />
 
-      {value ? <p className="mt-1 text-[12px] tracking-widest text-[#8a8a8a]">{value}</p> : null}
+      {value ? <p className="mt-1 ml-4 text-[12px] tracking-widest text-[#8a8a8a]">{value}</p> : null}
 
       {expanded ? children : null}
     </section>
