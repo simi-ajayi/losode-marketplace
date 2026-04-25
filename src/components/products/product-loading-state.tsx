@@ -4,14 +4,17 @@ interface ProductCardsSkeletonProps {
 
 export function ProductFiltersSkeleton() {
   return (
-    <aside className="h-fit">
+    <aside className="h-fit px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
       <div className="flex items-center justify-between border-b border-[#d4d4d4] pb-3">
         <div className="h-5 w-20 animate-pulse rounded bg-[#d9d9d9]" />
         <div className="h-5 w-24 animate-pulse rounded bg-[#d9d9d9]" />
       </div>
 
       {Array.from({ length: 6 }).map((_, index) => (
-        <div key={`section-skeleton-${index}`} className="space-y-3 border-b border-[#d4d4d4] py-5">
+        <div
+          key={`section-skeleton-${index}`}
+          className="space-y-3 border-b border-[#d4d4d4] py-5"
+        >
           <div className="flex items-center justify-between">
             <div className="h-5 w-28 animate-pulse rounded bg-[#d9d9d9]" />
             <div className="h-5 w-5 animate-pulse rounded bg-[#d9d9d9]" />

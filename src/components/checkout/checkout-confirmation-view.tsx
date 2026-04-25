@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { Button, Result } from "antd";
+import { Result } from "antd";
+import { AppButton } from "@/components/ui/app-button";
 
 export function CheckoutConfirmationView() {
   const searchParams = useSearchParams();
@@ -14,16 +15,16 @@ export function CheckoutConfirmationView() {
 
   if (status === "success") {
     return (
-      <section className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm sm:p-10">
+      <section className="rounded-3xl  border border-[#eadfce] bg-white px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
         <Result
           status="success"
           title="Payment successful"
           subTitle={`Reference: ${reference ?? "N/A"}`}
           extra={
             <Link href="/">
-              <Button type="primary" className="!h-11 !rounded-full !px-8">
+              <AppButton variant="primary" className="!h-11 !rounded-full !px-8">
                 Continue shopping
-              </Button>
+              </AppButton>
             </Link>
           }
         />
@@ -33,7 +34,7 @@ export function CheckoutConfirmationView() {
 
   if (status === "failed") {
     return (
-      <section className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm sm:p-10">
+      <section className="rounded-3xl border border-[#eadfce] bg-white px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
         <Result
           status="error"
           title="Payment failed"
@@ -41,12 +42,20 @@ export function CheckoutConfirmationView() {
           extra={
             <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
               <Link href="/checkout">
-                <Button type="primary" className="!h-11 !rounded-full !px-8">
+                <AppButton
+                  variant="primary"
+                  className="!h-11 !rounded-full !px-8"
+                >
                   Retry payment
-                </Button>
+                </AppButton>
               </Link>
               <Link href="/cart">
-                <Button className="!h-11 !rounded-full !px-8">Back to cart</Button>
+                <AppButton
+                  variant="outline"
+                  className="!h-11 !rounded-full !px-8"
+                >
+                  Back to cart
+                </AppButton>
               </Link>
             </div>
           }
@@ -56,7 +65,7 @@ export function CheckoutConfirmationView() {
   }
 
   return (
-    <section className="rounded-3xl border border-[#eadfce] bg-white p-6 shadow-sm sm:p-10">
+    <section className="rounded-3xl border border-[#eadfce] bg-white px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
       <Result
         status="warning"
         title="Payment cancelled"
@@ -68,12 +77,20 @@ export function CheckoutConfirmationView() {
         extra={
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link href="/checkout">
-              <Button type="primary" className="!h-11 !rounded-full !px-8">
+              <AppButton
+                variant="primary"
+                className="!h-11 !rounded-full !px-8"
+              >
                 Return to checkout
-              </Button>
+              </AppButton>
             </Link>
             <Link href="/">
-              <Button className="!h-11 !rounded-full !px-8">Continue shopping</Button>
+              <AppButton
+                variant="outline"
+                className="!h-11 !rounded-full !px-8"
+              >
+                Continue shopping
+              </AppButton>
             </Link>
           </div>
         }

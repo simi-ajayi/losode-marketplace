@@ -23,9 +23,9 @@ export default function RootLayout({
       <body className="min-h-full bg-[#ffffff] text-[#1b1b1b]">
         <AntdRegistry>
           <AppProviders>
-            <div className="relative min-h-screen overflow-x-clip bg-[#ffffff]">
+            <div className="relative flex min-h-screen flex-col overflow-x-clip bg-[#ffffff]">
               <SiteHeader />
-              <main className="mx-auto w-full max-w-[1880px] flex-1 px-4 py-6 sm:px-7 sm:py-8 lg:px-20 lg:py-9">
+              <main className="mx-auto w-full max-w-[1880px] flex-1">
                 {children}
               </main>
               <SiteFooter />
