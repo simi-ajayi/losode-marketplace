@@ -6,7 +6,8 @@ import { Button, type ButtonProps } from "antd";
 type AppButtonVariant = "primary" | "outline" | "ghost" | "text" | "chip";
 type AppButtonSize = "sm" | "md" | "lg" | "icon";
 
-export interface AppButtonProps extends Omit<ButtonProps, "type" | "size"> {
+export interface AppButtonProps
+  extends Omit<ButtonProps, "type" | "size" | "variant"> {
   variant?: AppButtonVariant;
   uiSize?: AppButtonSize;
   fullWidth?: boolean;
