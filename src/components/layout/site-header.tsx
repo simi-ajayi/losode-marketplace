@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import {
   HeartOutlined,
@@ -10,11 +11,16 @@ import {
   ShoppingOutlined,
   UserOutlined,
 } from "@ant-design/icons";
-import { Button, Drawer, Layout, Menu, type MenuProps } from "antd";
+import { AutoComplete, Button, Drawer, Input, Layout, Menu, type MenuProps } from "antd";
 
 import { selectCartItemCount } from "@/store/cart-slice";
 import { useAppSelector } from "@/store/hooks";
 import Image from "next/image";
+import { useProducts } from "@/lib/hooks/use-products";
+import {
+  getClosestProductTitleSuggestions,
+  HEADER_SEARCH_PARAM,
+} from "@/lib/product-search";
 
 const TOP_TABS = [
   { label: "Women", href: "/" },
@@ -36,8 +42,27 @@ const CATEGORY_LINKS = [
 ];
 
 export function SiteHeader() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const cartCount = useAppSelector(selectCartItemCount);
+  const { data: products = [] } = useProducts();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchDraft, setSearchDraft] = useState("");
+  const [isTypingSearch, setIsTypingSearch] = useState(false);
+
+  const headerQueryTerm = searchParams.get(HEADER_SEARCH_PARAM) ?? "";
+  const activeSearchTerm = isTypingSearch ? searchDraft : headerQueryTerm;
+
+  const searchSuggestions = useMemo(
+    () =>
+      getClosestProductTitleSuggestions(
+        products.map((product) => product.title),
+        activeSearchTerm,
+        5,
+      ).map((title) => ({ value: title, label: title })),
+    [activeSearchTerm, products],
+  );
 
   const drawerItems = useMemo<MenuProps["items"]>(
     () => [
@@ -57,6 +82,43 @@ export function SiteHeader() {
     [],
   );
 
+  const updateSearchQuery = useCallback(
+    (value: string, navigateToListing = false) => {
+      const cleanedValue = value.trim();
+      const currentQueryValue = searchParams.get(HEADER_SEARCH_PARAM) ?? "";
+      const onListingPage = pathname === "/";
+
+      if (!navigateToListing && onListingPage && cleanedValue === currentQueryValue) {
+        return;
+      }
+
+      const nextSearchParams = onListingPage
+        ? new URLSearchParams(searchParams.toString())
+        : new URLSearchParams();
+
+      if (cleanedValue) {
+        nextSearchParams.set(HEADER_SEARCH_PARAM, cleanedValue);
+      } else {
+        nextSearchParams.delete(HEADER_SEARCH_PARAM);
+      }
+
+      const targetPathname = navigateToListing || !onListingPage ? "/" : pathname;
+      const nextUrl = nextSearchParams.toString()
+        ? `${targetPathname}?${nextSearchParams.toString()}`
+        : targetPathname;
+
+      setSearchDraft(cleanedValue);
+      setIsTypingSearch(false);
+      router.replace(nextUrl, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
+  const onSearchInputChange = (nextValue: string) => {
+    setIsTypingSearch(true);
+    setSearchDraft(nextValue);
+  };
+
   const imageUrl = "https://www.losode.com/images/logo-white-no-tag.png";
 
   return (
@@ -65,12 +127,18 @@ export function SiteHeader() {
         <div className="mx-auto flex h-7 w-full max-w-[2048px] items-center justify-between px-4 text-[13px] text-[#1f1f1f] sm:px-8 lg:px-20">
           <p className="truncate">
             New to Losode?{" "}
-            <Link href="/" className="underline decoration-[1.5px] underline-offset-2">
+            <Link
+              href="/"
+              className="underline decoration-[1.5px] underline-offset-2"
+            >
               Subscribe
             </Link>{" "}
             and Get 10% off your first order
           </p>
-          <Link href="/" className="hidden underline decoration-[1.5px] underline-offset-2 sm:inline">
+          <Link
+            href="/"
+            className="hidden underline decoration-[1.5px] underline-offset-2 sm:inline"
+          >
             Sell On Losode
           </Link>
         </div>
@@ -100,24 +168,54 @@ export function SiteHeader() {
               aria-label="Losode home"
               className="w-[140px] my-2 h-[50px]"
             >
-                 <Image
-                    src={imageUrl}
-                    alt='Logo'
-                    width={900}
-                    height={1100}
-                    className="h-full w-full object-contain"
-                    unoptimized
-                  />
+              <Image
+                src={imageUrl}
+                alt="Logo"
+                width={900}
+                height={1100}
+                className="h-full w-full object-contain"
+                unoptimized
+              />
             </Link>
 
             <div className="ml-auto flex items-center gap-2 text-white">
-              <Button
-                type="text"
-                className="!h-9 !rounded-none !border-0 !px-1 !text-[14px] !text-white hover:!bg-transparent hover:!text-white"
-                icon={<SearchOutlined className="!text-[20px]" />}
+              <form
+                className="mr-1 flex h-9 items-center border-b border-white/50 pl-2"
+                onSubmit={(event) => {
+                  event.preventDefault();
+                  updateSearchQuery(activeSearchTerm, true);
+                }}
               >
-                Search
-              </Button>
+                <AutoComplete
+                  value={activeSearchTerm}
+                  options={searchSuggestions}
+                  filterOption={false}
+                  onChange={onSearchInputChange}
+                  onSelect={(value) => {
+                    updateSearchQuery(value, true);
+                  }}
+                  className="w-[150px] bg-transparent! xl:w-[190px]"
+                  popupClassName="!rounded-none"
+                >
+                  <Input
+                    allowClear
+                    variant="borderless"
+                    size="small"
+                    placeholder="Search"
+                    suffix={
+                      <SearchOutlined className="!text-[16px] !text-white" />
+                    }
+                    className="!h-8 bg-transparent! !px-0 !text-[14px] !text-white placeholder:!text-white/70"
+                    onFocus={() => {
+                      setSearchDraft(headerQueryTerm);
+                      setIsTypingSearch(true);
+                    }}
+                    onBlur={() => {
+                      setIsTypingSearch(false);
+                    }}
+                  />
+                </AutoComplete>
+              </form>
               <Button
                 type="text"
                 aria-label="Account"
@@ -149,12 +247,16 @@ export function SiteHeader() {
               <span>NGN</span>
             </div>
 
-            <nav className="flex flex-1 items-center justify-between mx-40 gap-5 text-[14px] leading-none">
+            <nav className="flex flex-1 items-center justify-between mx-32 gap-5 text-[14px] leading-none">
               {CATEGORY_LINKS.map((item) => (
                 <Link
                   key={item.label}
                   href={item.href}
-                  className={item.isSale ? "text-[#f54141]" : "text-white/92 hover:text-white"}
+                  className={
+                    item.isSale
+                      ? "text-[#f54141]"
+                      : "text-white/92 hover:text-white"
+                  }
                 >
                   {item.label}
                 </Link>
@@ -174,9 +276,16 @@ export function SiteHeader() {
             <Link
               href="/"
               aria-label="Losode home"
-              className="font-serif text-[40px] leading-[0.82] tracking-[-0.03em] text-white"
+              className="font-serif text-[40px] leading-[0.82] tracking-[-0.03em] h-20 w-18 text-white"
             >
-              losode
+              <Image
+                src={imageUrl}
+                alt="Logo"
+                width={900}
+                height={1100}
+                className="h-full w-full object-contain"
+                unoptimized
+              />
             </Link>
 
             <Link href="/cart" aria-label="Cart">

@@ -43,7 +43,7 @@ export function ProductCard({ product }: ProductCardProps) {
             alt={product.title}
             width={900}
             height={1100}
-            className="aspect-[4/5] h-full min-h-[480px] w-full object-cover transition duration-500 group-hover:scale-[1.025]"
+            className="aspect-[4/5] h-full min-h-[400px] md:min-h-[480px] w-full object-cover transition duration-500 group-hover:scale-[1.025]"
             unoptimized
           />
         </Link>

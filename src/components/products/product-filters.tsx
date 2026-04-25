@@ -21,6 +21,26 @@ type FilterSection =
   | "color"
   | "price";
 
+type ChecklistSection = Exclude<FilterSection, "category" | "price">;
+
+const FILTER_CHECKLIST_OPTIONS: Record<ChecklistSection, string[]> = {
+  designers: [],
+  size: [],
+  occasion: [],
+  fit: [],
+  returns: [],
+  color: [],
+};
+
+const INITIAL_CHECKLIST_STATE: Record<ChecklistSection, string[]> = {
+  designers: [],
+  size: [],
+  occasion: [],
+  fit: [],
+  returns: [],
+  color: [],
+};
+
 interface ProductFiltersProps {
   selectedCategoryId: number | null;
   priceRange: [number, number];
@@ -45,15 +65,17 @@ export function ProductFilters({
   onClearAll,
 }: ProductFiltersProps) {
   const [expandedSections, setExpandedSections] = useState<Record<FilterSection, boolean>>({
-    category: true,
-    designers: true,
-    size: true,
-    occasion: true,
-    fit: true,
-    returns: true,
-    color: true,
-    price: true,
+    category: false,
+    designers: false,
+    size: false,
+    occasion: false,
+    fit: false,
+    returns: false,
+    color: false,
+    price: false,
   });
+  const [selectedChecklistOptions, setSelectedChecklistOptions] =
+    useState<Record<ChecklistSection, string[]>>(INITIAL_CHECKLIST_STATE);
 
   const activeCategory = useMemo(
     () => categories.find((category) => category.id === selectedCategoryId) ?? null,
@@ -83,16 +105,42 @@ export function ProductFilters({
     onPriceChange([priceRange[0], safeValue]);
   };
 
+  const toggleChecklistOption = (
+    section: ChecklistSection,
+    option: string,
+    checked: boolean,
+  ) => {
+    setSelectedChecklistOptions((previous) => {
+      const currentOptions = previous[section];
+      const nextOptions = checked
+        ? [...currentOptions, option]
+        : currentOptions.filter((item) => item !== option);
+
+      return {
+        ...previous,
+        [section]: nextOptions,
+      };
+    });
+  };
+
+  const getChecklistLabel = (section: ChecklistSection) => {
+    const selectedCount = selectedChecklistOptions[section].length;
+    return selectedCount > 0 ? `${selectedCount} selected` : "All";
+  };
+
   if (isLoading) {
     return <ProductFiltersSkeleton />;
   }
 
   return (
-    <aside className="h-fit xl:w-[25vw] 2xl:w-[18vw]">
+    <aside className="h-fit xl:w-[16vw] 2xl:w-[18vw]">
       <div className="flex items-center justify-between border-b border-[#d4d4d4] pb-3 text-[14px] text-[#2f2f2f]">
         <AppButton
           variant="text"
-          onClick={onClearAll}
+          onClick={() => {
+            setSelectedChecklistOptions(INITIAL_CHECKLIST_STATE);
+            onClearAll();
+          }}
           className="!h-auto !px-0 !text-[14px]"
         >
           Clear All
@@ -106,84 +154,156 @@ export function ProductFilters({
         expanded={expandedSections.category}
         onToggle={() => toggleSection("category")}
       >
-        <div className="mt-3 flex">
-          <AppButton
-            variant="chip"
-            uiSize="sm"
-            onClick={() => onCategoryChange(null)}
-            className={
-              selectedCategoryId === null
-                ? "!border-black !bg-black !text-[#444]"
-                : "!border-[#bcbcbc] !text-[#444]"
-            }
+        <div className="mt-3 space-y-2 flex flex-col text-[12px] text-[#2c2c2c]">
+          <AppCheckbox
+            checked={selectedCategoryId === null}
+            onChange={(event) => {
+              if (event.target.checked) {
+                onCategoryChange(null);
+              }
+            }}
           >
             All
-          </AppButton>
+          </AppCheckbox>
           {categories.map((category) => (
-            <AppButton
+            <AppCheckbox
               key={category.id}
-              variant="chip"
-              uiSize="sm"
-              onClick={() => onCategoryChange(category.id)}
-              className={
-                selectedCategoryId === category.id
-                  ? "!border-black !bg-black !text-[#444]"
-                  : "!border-[#bcbcbc] !text-[#444]"
-              }
+              checked={selectedCategoryId === category.id}
+              onChange={(event) => {
+                onCategoryChange(event.target.checked ? category.id : null);
+              }}
             >
               {category.name}
-            </AppButton>
+            </AppCheckbox>
           ))}
         </div>
       </FilterSectionBlock>
 
       <FilterSectionBlock
         title="Designers"
-        value="All"
+        value={getChecklistLabel("designers")}
         expanded={expandedSections.designers}
         onToggle={() => toggleSection("designers")}
-      />
+      >
+        <div className="mt-3 space-y-2 text-[12px] text-[#2c2c2c]">
+          {FILTER_CHECKLIST_OPTIONS.designers.map((option) => (
+            <AppCheckbox
+              key={option}
+              checked={selectedChecklistOptions.designers.includes(option)}
+              onChange={(event) =>
+                toggleChecklistOption("designers", option, event.target.checked)
+              }
+            >
+              {option}
+            </AppCheckbox>
+          ))}
+        </div>
+      </FilterSectionBlock>
 
       <FilterSectionBlock
         title="Size"
-        value="All"
+        value={getChecklistLabel("size")}
         expanded={expandedSections.size}
         onToggle={() => toggleSection("size")}
-      />
+      >
+        <div className="mt-3 space-y-2  text-[12px] text-[#2c2c2c]">
+          {FILTER_CHECKLIST_OPTIONS.size.map((option) => (
+            <AppCheckbox
+              key={option}
+              checked={selectedChecklistOptions.size.includes(option)}
+              onChange={(event) =>
+                toggleChecklistOption("size", option, event.target.checked)
+              }
+            >
+              {option}
+            </AppCheckbox>
+          ))}
+        </div>
+      </FilterSectionBlock>
 
       <FilterSectionBlock
         title="Occasion"
-        value="All"
+        value={getChecklistLabel("occasion")}
         expanded={expandedSections.occasion}
         onToggle={() => toggleSection("occasion")}
-      />
+      >
+        <div className="mt-3 space-y-2 text-[12px] text-[#2c2c2c]">
+          {FILTER_CHECKLIST_OPTIONS.occasion.map((option) => (
+            <AppCheckbox
+              key={option}
+              checked={selectedChecklistOptions.occasion.includes(option)}
+              onChange={(event) =>
+                toggleChecklistOption("occasion", option, event.target.checked)
+              }
+            >
+              {option}
+            </AppCheckbox>
+          ))}
+        </div>
+      </FilterSectionBlock>
 
       <FilterSectionBlock
         title="Fit"
-        value="All"
+        value={getChecklistLabel("fit")}
         expanded={expandedSections.fit}
         onToggle={() => toggleSection("fit")}
-      />
+      >
+        <div className="mt-3 space-y-2 text-[12px] text-[#2c2c2c]">
+          {FILTER_CHECKLIST_OPTIONS.fit.map((option) => (
+            <AppCheckbox
+              key={option}
+              checked={selectedChecklistOptions.fit.includes(option)}
+              onChange={(event) =>
+                toggleChecklistOption("fit", option, event.target.checked)
+              }
+            >
+              {option}
+            </AppCheckbox>
+          ))}
+        </div>
+      </FilterSectionBlock>
 
       <FilterSectionBlock
         title="Returns"
-        value="All"
+        value={getChecklistLabel("returns")}
         expanded={expandedSections.returns}
         onToggle={() => toggleSection("returns")}
       >
         <div className="mt-3 space-y-2 text-[12px] text-[#2c2c2c]">
-          {["Amendments", "Exchanges", "Returns"].map((option) => (
-            <AppCheckbox key={option}>{option}</AppCheckbox>
+          {FILTER_CHECKLIST_OPTIONS.returns.map((option) => (
+            <AppCheckbox
+              key={option}
+              checked={selectedChecklistOptions.returns.includes(option)}
+              onChange={(event) =>
+                toggleChecklistOption("returns", option, event.target.checked)
+              }
+            >
+              {option}
+            </AppCheckbox>
           ))}
         </div>
       </FilterSectionBlock>
 
       <FilterSectionBlock
         title="Color"
-        value="All"
+        value={getChecklistLabel("color")}
         expanded={expandedSections.color}
         onToggle={() => toggleSection("color")}
-      />
+      >
+        <div className="mt-3 space-y-2 text-[12px] text-[#2c2c2c]">
+          {FILTER_CHECKLIST_OPTIONS.color.map((option) => (
+            <AppCheckbox
+              key={option}
+              checked={selectedChecklistOptions.color.includes(option)}
+              onChange={(event) =>
+                toggleChecklistOption("color", option, event.target.checked)
+              }
+            >
+              {option}
+            </AppCheckbox>
+          ))}
+        </div>
+      </FilterSectionBlock>
 
       <FilterSectionBlock
         title="Price"

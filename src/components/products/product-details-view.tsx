@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { type TouchEvent, useState } from "react";
 
 import { HeartOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import { Alert, message } from "antd";
@@ -35,6 +35,7 @@ export function ProductDetailsView({ productId }: ProductDetailsViewProps) {
   const { data: product, isLoading, isError, error } = useProduct(productId);
 
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [selectedColor, setSelectedColor] = useState(COLOR_OPTIONS[0].value);
   const [selectedSize, setSelectedSize] = useState(SIZE_OPTIONS[0]);
   const [expandedSection, setExpandedSection] = useState<"description" | "size-fit" | null>(
@@ -57,12 +58,10 @@ export function ProductDetailsView({ productId }: ProductDetailsViewProps) {
   }
 
   const galleryImages = product.images.length ? product.images : [FALLBACK_IMAGE];
-  const paddedGallery =
-    galleryImages.length >= 4
-      ? galleryImages
-      : Array.from({ length: 4 }, (_, index) => galleryImages[index % galleryImages.length]);
-  const safeImageIndex = Math.min(selectedImageIndex, paddedGallery.length - 1);
-  const selectedImage = paddedGallery[safeImageIndex] || FALLBACK_IMAGE;
+  const totalImages = galleryImages.length;
+  const safeImageIndex = ((selectedImageIndex % totalImages) + totalImages) % totalImages;
+  const selectedImage = galleryImages[safeImageIndex] || FALLBACK_IMAGE;
+  const canNavigateImages = totalImages > 1;
   const selectedColorLabel =
     COLOR_OPTIONS.find((option) => option.value === selectedColor)?.name ?? "White";
 
@@ -77,6 +76,53 @@ export function ProductDetailsView({ productId }: ProductDetailsViewProps) {
   const handleAddToCart = () => {
     dispatch(addToCart(product));
     message.success("Item added to bag.");
+  };
+
+  const showPreviousImage = () => {
+    if (!canNavigateImages) {
+      return;
+    }
+
+    setSelectedImageIndex((previous) => (previous - 1 + totalImages) % totalImages);
+  };
+
+  const showNextImage = () => {
+    if (!canNavigateImages) {
+      return;
+    }
+
+    setSelectedImageIndex((previous) => (previous + 1) % totalImages);
+  };
+
+  const handleImageTouchStart = (event: TouchEvent<HTMLDivElement>) => {
+    if (!canNavigateImages) {
+      return;
+    }
+
+    const touchPoint = event.touches[0];
+    setTouchStartX(touchPoint ? touchPoint.clientX : null);
+  };
+
+  const handleImageTouchEnd = (event: TouchEvent<HTMLDivElement>) => {
+    if (!canNavigateImages || touchStartX === null) {
+      setTouchStartX(null);
+      return;
+    }
+
+    const touchPoint = event.changedTouches[0];
+    const touchEndX = touchPoint ? touchPoint.clientX : touchStartX;
+    const deltaX = touchEndX - touchStartX;
+    const SWIPE_THRESHOLD = 45;
+
+    if (Math.abs(deltaX) >= SWIPE_THRESHOLD) {
+      if (deltaX > 0) {
+        showPreviousImage();
+      } else {
+        showNextImage();
+      }
+    }
+
+    setTouchStartX(null);
   };
 
   return (
@@ -94,9 +140,9 @@ export function ProductDetailsView({ productId }: ProductDetailsViewProps) {
       </nav>
 
       <section className="grid gap-10 xl:grid-cols-[minmax(0,50%)_minmax(50%,1fr)]">
-        <div className="grid grid-cols-[84px_minmax(0,1fr)] gap-6">
+        <div className="grid gap-4 sm:grid-cols-[84px_minmax(0,1fr)] sm:gap-6">
           <div className="hidden flex-col gap-5 sm:flex">
-            {paddedGallery.map((image, index) => {
+            {galleryImages.map((image, index) => {
               const isActive = index === safeImageIndex;
 
               return (
@@ -122,46 +168,43 @@ export function ProductDetailsView({ productId }: ProductDetailsViewProps) {
             })}
           </div>
 
-          <div className="relative overflow-hidden px-10">
+          <div
+            className="relative overflow-hidden px-0 touch-pan-y sm:px-10"
+            onTouchStart={handleImageTouchStart}
+            onTouchEnd={handleImageTouchEnd}
+            onTouchCancel={() => setTouchStartX(null)}
+          >
             <Image
               src={selectedImage}
               alt={product.title}
               width={1200}
               height={1500}
-              className="aspect-[4/5] h-[90vh] w-full object-cover"
+              className="aspect-[4/5] w-full object-cover"
               unoptimized
             />
 
-            <div className="absolute inset-y-0 left-4 right-4 flex items-center justify-between px-10">
-              <AppButton
-                variant="text"
-                uiSize="icon"
-                className="!h-auto !w-auto !p-0 !text-6xl !font-light !text-black/70 hover:!text-black"
-                onClick={() =>
-                  setSelectedImageIndex(
-                    (previous) =>
-                      (previous - 1 + paddedGallery.length) %
-                      paddedGallery.length,
-                  )
-                }
-                aria-label="View previous product image"
-              >
-                <LeftOutlined />
-              </AppButton>
-              <AppButton
-                variant="text"
-                uiSize="icon"
-                className="!h-auto !w-auto !p-0 !text-6xl !font-light !text-black/70 hover:!text-black"
-                onClick={() =>
-                  setSelectedImageIndex(
-                    (previous) => (previous + 1) % paddedGallery.length,
-                  )
-                }
-                aria-label="View next product image"
-              >
-                <RightOutlined />
-              </AppButton>
-            </div>
+            {canNavigateImages ? (
+              <div className="absolute inset-y-0 left-4 right-4 hidden items-center justify-between px-10 sm:flex">
+                <AppButton
+                  variant="text"
+                  uiSize="icon"
+                  className="!h-auto !w-auto !p-0 !text-6xl !font-light !text-black/70 hover:!text-black"
+                  onClick={showPreviousImage}
+                  aria-label="View previous product image"
+                >
+                  <LeftOutlined />
+                </AppButton>
+                <AppButton
+                  variant="text"
+                  uiSize="icon"
+                  className="!h-auto !w-auto !p-0 !text-6xl !font-light !text-black/70 hover:!text-black"
+                  onClick={showNextImage}
+                  aria-label="View next product image"
+                >
+                  <RightOutlined />
+                </AppButton>
+              </div>
+            ) : null}
           </div>
         </div>
 

@@ -4,7 +4,7 @@ interface ProductCardsSkeletonProps {
 
 export function ProductFiltersSkeleton() {
   return (
-    <aside className="h-fit px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
+    <aside className="h-fit ">
       <div className="flex items-center justify-between border-b border-[#d4d4d4] pb-3">
         <div className="h-5 w-20 animate-pulse rounded bg-[#d9d9d9]" />
         <div className="h-5 w-24 animate-pulse rounded bg-[#d9d9d9]" />
@@ -40,7 +40,7 @@ export function ProductFiltersSkeleton() {
 
 export function ProductCardsSkeleton({ count = 8 }: ProductCardsSkeletonProps) {
   return (
-    <section className="grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+    <section className="grid  grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
       {Array.from({ length: count }).map((_, index) => (
         <article key={`card-skeleton-${index}`} className="space-y-4">
           <div className="relative overflow-hidden rounded-sm bg-[#dadada]">
@@ -61,7 +61,7 @@ export function ProductCardsSkeleton({ count = 8 }: ProductCardsSkeletonProps) {
 
 export function ProductListingSkeleton() {
   return (
-    <div className="space-y-10">
+    <div className="space-y-10 px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
       <section className="mx-auto max-w-5xl space-y-4 pt-4 text-center">
         <div className="mx-auto h-11 w-64 animate-pulse rounded bg-[#d9d9d9]" />
         <div className="mx-auto h-6 w-full max-w-4xl animate-pulse rounded bg-[#e0e0e0]" />
@@ -80,11 +80,11 @@ export function ProductListingSkeleton() {
 
 export function ProductDetailsSkeleton() {
   return (
-    <div className="space-y-7">
+    <div className="space-y-7 px-4 py-6 sm:px-7 sm:py-8 xl:px-15 2xl:px-20 lg:py-9">
       <div className="h-6 w-full max-w-4xl animate-pulse rounded bg-[#dbdbdb]" />
 
       <section className="grid gap-10 xl:grid-cols-[minmax(0,980px)_minmax(380px,1fr)]">
-        <div className="grid grid-cols-[84px_minmax(0,1fr)] gap-6">
+        <div className="grid gap-4 sm:grid-cols-[84px_minmax(0,1fr)] sm:gap-6">
           <div className="hidden space-y-4 sm:block">
             {Array.from({ length: 4 }).map((_, index) => (
               <div
