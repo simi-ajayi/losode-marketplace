@@ -24,6 +24,8 @@ const CUSTOMER_LINKS = [
   "Contact Us",
 ];
 
+  const imageUrl = "https://www.losode.com/images/logo-white-no-tag.png";
+
 const SOCIAL_ICONS = [
   { label: "Instagram", href: "https://www.losode.com/icons/new-footer-instagram-icon.svg" },
   { label: "Facebook", href: "https://www.losode.com/icons/new-footer-facebook-icon.svg" },
@@ -55,10 +57,10 @@ export function SiteFooter() {
         <div className="mx-auto w-full max-w-[2048px] px-4 py-14 sm:px-8 lg:px-20 lg:py-12">
           <div className="grid gap-14 lg:grid-cols-[1.08fr_1fr]">
             <div>
-              <h2 className="text-[10px] font-mono font-semibold tracking-tight leading-[1.15] text-[#171717] sm:text-[16px]">
+              <h2 className=" font-mono font-semibold tracking-tight leading-[1.15] text-[#171717] sm:text-[16px]">
                 Get a Discount off your First Order on Losode
               </h2>
-              <p className="mt-6 max-w-[820px] text-[8px] leading-[1.45] text-[#2f2f2f] sm:text-[12px]">
+              <p className="mt-6 max-w-[820px]  leading-[1.45] text-[#2f2f2f] sm:text-[12px]">
                 Enjoy 10% off your first order when you sign up to our newsletter.
                 <br />
                 Be the first to hear about new arrivals, exclusive offers, and more.
@@ -67,11 +69,11 @@ export function SiteFooter() {
               <div className="mt-9 flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Input
                   placeholder="Enter your email"
-                  className="losode-footer-email !h-[52px] !w-full !max-w-[640px] !rounded-none !border-[#bdbdbd] !bg-white !text-[16px]"
+                  className="losode-footer-email !h-[40px] !w-full md:!max-w-[280px] max-w-full !rounded-none !border-[#bdbdbd] !bg-white !text-[14px]"
                 />
                 <Button
                   type="primary"
-                  className="!h-[52px] !rounded-none !border-black !bg-black !px-8 !text-[17px] !font-medium hover:!border-[#171717] hover:!bg-[#171717]"
+                  className="!h-[36px] !rounded-none md:max-w-[180px]! !border-black !bg-black !px-8 !text-[14px] !font-medium hover:!border-[#171717] hover:!bg-[#171717]"
                 >
                   Subscribe
                 </Button>
@@ -86,7 +88,7 @@ export function SiteFooter() {
                       width={30}
                       height={30}
                       unoptimized
-                      className="h-[30px] w-[30px] object-contain"
+                      className="h-[20px] w-[20px] object-contain"
                     />
                   </Link>
                 ))}
@@ -95,10 +97,10 @@ export function SiteFooter() {
 
             <div className="space-y-10 lg:pl-10">
               <div>
-                <h3 className="text-[24px] font-semibold leading-[1.12] text-[#141414] sm:text-[30px]">
+                <h3 className="text-[16px] font-semibold leading-[1.12] text-[#141414] ">
                   Need Help?
                 </h3>
-                <p className="mt-5 text-[16px] leading-[1.45] text-[#2e2e2e] sm:text-[18px]">
+                <p className="mt-5 text-[12px] leading-[1.45] text-[#2e2e2e] ">
                   For any enquires, please contact our User Engagement Call Centre
                   <br />
                   02013306011 or send an email to hello@losode.com
@@ -106,10 +108,10 @@ export function SiteFooter() {
               </div>
 
               <div>
-                <h3 className="text-[24px] font-semibold leading-[1.15] text-[#151515] sm:text-[30px]">
+                <h3 className="text-[12px] font-semibold leading-[1.15] text-[#151515] ">
                   Location and Currency
                 </h3>
-                <div className="mt-4 flex items-center gap-4 text-[17px] text-[#171717]">
+                <div className="mt-4 flex items-center gap-4 text-[12px] text-[#171717]">
                   <NigeriaFlagIcon />
                   <span>NGN</span>
                 </div>
@@ -120,16 +122,16 @@ export function SiteFooter() {
       </section>
 
       <section className="bg-[linear-gradient(120deg,#252628_0%,#2c2d30_100%)] text-[#f2f2f2]">
-        <div className="mx-auto w-full max-w-[2048px] px-4 py-12 sm:px-8 lg:px-20 lg:py-11">
+        <div className="mx-auto w-full max-w-[2048px] px-4 py-12 sm:px-8 lg:px-20 lg:pt-11 lg:pb-4  ">
           <div className="grid gap-14 lg:grid-cols-[1fr_1.12fr_1.3fr]">
             <section>
-              <h3 className="text-[30px] font-semibold leading-none text-[#f0f0f0] sm:text-[34px]">
+              <h3 className="text-[16px] font-semibold leading-none text-[#f0f0f0] ">
                 Useful Information
               </h3>
               <ul className="mt-8 space-y-5">
                 {USEFUL_INFORMATION_LINKS.map((item) => (
                   <li key={item}>
-                    <Link href="/" className="text-[16px] leading-none text-[#cecece] hover:text-[#f2f2f2] sm:text-[17px]">
+                    <Link href="/" className="text-[12px]">
                       {item}
                     </Link>
                   </li>
@@ -138,13 +140,13 @@ export function SiteFooter() {
             </section>
 
             <section>
-              <h3 className="text-[30px] font-semibold leading-none text-[#f0f0f0] sm:text-[34px]">
+              <h3 className="text-[16px] font-semibold leading-none text-[#f0f0f0] ">
                 Customers and Designers
               </h3>
               <ul className="mt-8 space-y-5">
                 {CUSTOMER_LINKS.map((item) => (
                   <li key={item}>
-                    <Link href="/" className="text-[16px] leading-none text-[#cecece] hover:text-[#f2f2f2] sm:text-[17px]">
+                    <Link href="/" className="text-[16px] leading-none text-[#cecece] hover:text-[#f2f2f2] sm:text-[12px]">
                       {item}
                     </Link>
                   </li>
@@ -156,19 +158,26 @@ export function SiteFooter() {
               <Link
                 href="/"
                 aria-label="Losode home"
-                className="font-serif text-[72px] leading-[0.8] tracking-[-0.04em] text-[#f2f2f2] sm:text-[86px]"
+                className="w-10 h-10"
               >
-                losode
+                   <Image
+                                   src={imageUrl}
+                                   alt='Logo'
+                                   width={900}
+                                   height={1100}
+                                   className="h-20 w-52 object-contain"
+                                   unoptimized
+                                 />
               </Link>
-              <p className="mt-10 text-[17px] text-[#ececec]">
+              <p className="mt-10 text-[14px] text-[#ececec]">
                 We accept payment from these providers:
               </p>
 
-              <div className="mt-5 flex flex-wrap items-center gap-4">
+              <div className=" flex flex-wrap items-center ">
                 {PAYMENT_ICONS.map((icon) => (
                   <span
                     key={icon.label}
-                    className="inline-flex h-12 min-w-[72px] items-center justify-center rounded-md  px-2"
+                    className="inline-flex h-12 min-w-[52px] items-center justify-center rounded-md"
                   >
                     <Image
                       src={icon.href}
@@ -176,7 +185,7 @@ export function SiteFooter() {
                       width={40}
                       height={26}
                       unoptimized
-                      className="h-auto w-auto max-w-11 opacity-95"
+                      className="h-auto w-auto max-w-10 opacity-95"
                     />
                   </span>
                 ))}
@@ -184,7 +193,7 @@ export function SiteFooter() {
             </section>
           </div>
 
-          <div className="mt-12 border-t border-white/20 pt-4 text-[16px] text-[#e4e4e4]">
+          <div className="mt-12 border-t border-white/20 pt-4 text-[12px] text-[#e4e4e4]">
             <span>© {year}, Losode Inc.</span>{" "}
             <span className="text-[#8e8e8e]">Always Beyond Borders</span>
           </div>

@@ -185,7 +185,7 @@ export function CartPageView() {
                             variant="text"
                             className="!h-auto !p-0 !text-[15px]"
                             onClick={() => {
-                              // Placeholder for future save-for-later flow.
+                   
                             }}
                           >
                             Save for later
@@ -210,7 +210,7 @@ export function CartPageView() {
           </div>
         </div>
 
-        <aside className="h-fit px-10 pt-4">
+        <aside className="h-fit md:px-10 px-2 pt-4">
           <h2 className="pb-6 text-[20px] font-semibold leading-none text-[#222326] sm:text-[22px]">
             Order Information
           </h2>

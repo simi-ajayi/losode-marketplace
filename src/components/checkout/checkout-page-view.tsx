@@ -37,6 +37,24 @@ const INITIAL_ADDRESS: DeliveryAddress = {
   phone: "",
 };
 
+const REQUIRED_ADDRESS_FIELDS: Array<keyof DeliveryAddress> = [
+  "fullName",
+  "street",
+  "cityState",
+  "postalCode",
+  "country",
+  "phone",
+];
+
+const ADDRESS_FIELD_LABELS: Record<keyof DeliveryAddress, string> = {
+  fullName: "Full name",
+  street: "Street",
+  cityState: "City / State",
+  postalCode: "Postal code",
+  country: "Country",
+  phone: "Phone number",
+};
+
 export function CheckoutPageView() {
   const dispatch = useAppDispatch();
   const router = useRouter();
@@ -57,6 +75,11 @@ export function CheckoutPageView() {
   const [paymentError, setPaymentError] = useState<string | null>(null);
 
   const amountInLowestDenomination = useMemo(() => Math.round(total * 100), [total]);
+  const missingDeliveryAddressFields = useMemo(
+    () => getMissingDeliveryAddressFields(deliveryAddress),
+    [deliveryAddress],
+  );
+  const isDeliveryAddressComplete = missingDeliveryAddressFields.length === 0;
 
   const initializePayment = async () => {
     setPaymentError(null);
@@ -72,6 +95,16 @@ export function CheckoutPageView() {
 
     if (!paymentEmail || !isValidEmail(paymentEmail)) {
       setPaymentError("Provide a valid email address before paying.");
+      return;
+    }
+
+    if (!isDeliveryAddressComplete) {
+      const missingFields = missingDeliveryAddressFields
+        .map((field) => ADDRESS_FIELD_LABELS[field])
+        .join(", ");
+      setPaymentError(
+        `Delivery address is required before payment. Missing: ${missingFields}.`,
+      );
       return;
     }
 
@@ -177,6 +210,17 @@ export function CheckoutPageView() {
   };
 
   const saveAddress = () => {
+    const missingFields = getMissingDeliveryAddressFields(addressDraft);
+    if (missingFields.length > 0) {
+      message.error(
+        `Please complete all required address fields: ${missingFields
+          .map((field) => ADDRESS_FIELD_LABELS[field])
+          .join(", ")}.`,
+      );
+      return;
+    }
+
+    setPaymentError(null);
     setDeliveryAddress(addressDraft);
     setIsEditingAddress(false);
     message.success("Delivery address updated.");
@@ -383,25 +427,32 @@ export function CheckoutPageView() {
             </div>
           ) : (
             <>
-              <div className="mt-8 flex items-start gap-4">
-                <CheckoutIndicatorRadio />
-                <div className="space-y-1 text-[15px] leading-[1.4] text-[#222222]">
-                  <p className="uppercase">{deliveryAddress.fullName}</p>
-                  <p>
-                    {deliveryAddress.street} {deliveryAddress.cityState}
-                  </p>
-                  <p>{deliveryAddress.postalCode}</p>
-                  <p>{deliveryAddress.country}</p>
-                  <p>{deliveryAddress.phone}</p>
+              {isDeliveryAddressComplete ? (
+                <div className="mt-8 flex items-start gap-4">
+                  <CheckoutIndicatorRadio />
+                  <div className="space-y-1 text-[15px] leading-[1.4] text-[#222222]">
+                    <p className="uppercase">{deliveryAddress.fullName}</p>
+                    <p>
+                      {deliveryAddress.street} {deliveryAddress.cityState}
+                    </p>
+                    <p>{deliveryAddress.postalCode}</p>
+                    <p>{deliveryAddress.country}</p>
+                    <p>{deliveryAddress.phone}</p>
+                  </div>
                 </div>
-              </div>
+              ) : (
+                <p className="mt-7 text-[15px] text-[#3a3a3a]">
+                  No delivery address saved yet. Add your address to continue
+                  to payment.
+                </p>
+              )}
 
               <AppButton
                 variant="primary"
                 className="!mt-8 !h-12 !min-w-[220px] !rounded-none !px-8 !text-[15px]"
                 onClick={startAddressEdit}
               >
-                Change Address
+                {isDeliveryAddressComplete ? "Change Address" : "Add Address"}
               </AppButton>
             </>
           )}
@@ -439,11 +490,21 @@ export function CheckoutPageView() {
             />
           ) : null}
 
+          {!isDeliveryAddressComplete ? (
+            <Alert
+              className="!mt-5"
+              type="warning"
+              showIcon
+              message="Delivery address required"
+              description="Add and save your delivery address before completing payment."
+            />
+          ) : null}
+
           <AppButton
             fullWidth
             variant="outline"
             onClick={initializePayment}
-            disabled={!checkoutEmail || isPaying}
+            disabled={!checkoutEmail || isPaying || !isDeliveryAddressComplete}
             className="!mt-8 !h-12 !rounded-none !border-[#2d2d2d] !bg-[#f5f5f5] !text-[15px] !text-[#acacac] enabled:!bg-black enabled:!text-white enabled:hover:!bg-[#151515]"
           >
             {isPaying ? "Processing..." : "Pay Now"}
@@ -548,6 +609,10 @@ export function CheckoutPageView() {
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function getMissingDeliveryAddressFields(address: DeliveryAddress) {
+  return REQUIRED_ADDRESS_FIELDS.filter((field) => !address[field].trim());
 }
 
 function CheckoutBlock({
